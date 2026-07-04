@@ -82,8 +82,6 @@ services:
     environment:
       TARGET_URL: http://backend:3000/health
       SLI_THRESHOLD_MS: 500
-    ports:
-      - "8080:8080"
     depends_on:
       - backend
     networks:

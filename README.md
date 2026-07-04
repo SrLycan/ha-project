@@ -8,7 +8,7 @@ Arquitectura de alta disponibilidad con Docker Compose para AWS EC2.
 - **backend**: API REST (Node/Express). Usuarios y compras persisten en PostgreSQL. Servicios viven en memoria (sin persistencia).
 - **frontend**: React + Nginx. Sirve el panel admin y hace de reverse proxy hacia el backend (`/api/*`). Único punto expuesto en el puerto 80.
 - **backup**: agente que corre `pg_dump` cada `BACKUP_INTERVAL_MINUTES` minutos, guarda `.sql` y un log de auditoría en `./backups`.
-- **monitor**: mide latencia del endpoint `/health` del backend cada 5s y expone un dashboard SLI en el puerto 8080.
+- **monitor**: mide latencia del endpoint `/health` del backend cada 5s y expone un dashboard SLI, accesible internamente a través de nginx (no necesita puerto propio abierto en el firewall/Security Group).
 
 ## Uso en EC2
 
@@ -21,7 +21,7 @@ docker compose up -d --build
 ```
 
 Panel admin: `http://<IP_PUBLICA_EC2>`
-Dashboard SLI: `http://<IP_PUBLICA_EC2>:8080`
+Dashboard SLI: `http://<IP_PUBLICA_EC2>/monitor/` (o directo desde el panel admin, sección "Monitor de disponibilidad")
 
 ## Backup manual
 

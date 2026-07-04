@@ -72,7 +72,7 @@ h1 { text-align:center; }
 <div class="card" id="card">Cargando...</div>
 <script>
 async function refresh() {
-    const res = await fetch("/api/metrics");
+    const res = await fetch("api/metrics");
     const data = await res.json();
     const status = data.last_check ? (data.last_check.ok ? "OK" : "FAIL") : "N/A";
     const statusClass = data.last_check ? (data.last_check.ok ? "ok" : "fail") : "";

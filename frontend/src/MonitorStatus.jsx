@@ -4,14 +4,14 @@ export default function MonitorStatus() {
     const [metrics, setMetrics] = useState(null);
     const [reachable, setReachable] = useState(null);
 
-    const monitorUrl = `http://${window.location.hostname}:8080`;
+    const monitorUrl = "/monitor/";
 
     useEffect(() => {
         let cancelled = false;
 
         async function load() {
             try {
-                const res = await fetch(`${monitorUrl}/api/metrics`, {
+                const res = await fetch(`${monitorUrl}api/metrics`, {
                     signal: AbortSignal.timeout(3000)
                 });
                 if (!res.ok) throw new Error("bad response");
@@ -51,11 +51,10 @@ export default function MonitorStatus() {
 
             {reachable === false && (
                 <div className="error">
-                    No se pudo conectar al monitor en <code>{monitorUrl}</code>. Si estás en AWS
-                    EC2, revisa que el puerto <strong>8080</strong> esté abierto en el Security
-                    Group (entrada TCP 8080 desde 0.0.0.0/0) y que el contenedor{" "}
-                    <code>startup_monitor</code> esté corriendo (
-                    <code>docker compose ps</code>).
+                    No se pudo conectar al monitor. Revisa que el contenedor{" "}
+                    <code>startup_monitor</code> esté corriendo (<code>docker compose ps</code>)
+                    y que nginx tenga la ruta <code>/monitor/</code> configurada (revisa{" "}
+                    <code>docker compose logs frontend</code>).
                 </div>
             )}
 
