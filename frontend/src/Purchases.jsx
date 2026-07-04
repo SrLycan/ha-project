@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import { ShoppingCart, PlusCircle, Trash2 } from "lucide-react";
 import { useToast } from "./ToastContext.jsx";
 
 export default function Purchases() {
@@ -48,23 +49,31 @@ export default function Purchases() {
         }
     }
 
-    async function handleDelete(id) {
+    async function handleDelete(id, product) {
         try {
             const res = await fetch(`/api/purchases/${id}`, { method: "DELETE" });
             if (!res.ok) {
                 toast.error("No se pudo eliminar la compra");
                 return;
             }
-            toast.success("Compra eliminada");
+            toast.success(`Compra "${product}" eliminada`);
             load();
         } catch (err) {
             toast.error("No se pudo conectar con el servidor");
         }
     }
 
+    const total = purchases.reduce((acc, p) => acc + Number(p.amount), 0);
+
     return (
         <div className="panel">
-            <h2>Compras</h2>
+            <div className="panel-title-row">
+                <h2>
+                    <ShoppingCart size={20} strokeWidth={2.2} />
+                    Compras
+                </h2>
+                <span className="count-pill mono">${total.toFixed(2)}</span>
+            </div>
             {error && <div className="error">{error}</div>}
             <form className="inline" onSubmit={handleSubmit}>
                 <select
@@ -93,15 +102,20 @@ export default function Purchases() {
                     onChange={(e) => setForm({ ...form, amount: e.target.value })}
                     required
                 />
-                <button type="submit">Registrar</button>
+                <button type="submit">
+                    <PlusCircle size={16} />
+                    Registrar
+                </button>
             </form>
             {purchases.length === 0 ? (
-                <p className="empty-state">Todavía no hay compras registradas.</p>
+                <div className="empty-state">
+                    <ShoppingCart size={28} strokeWidth={1.6} />
+                    <p>Todavía no hay compras registradas.</p>
+                </div>
             ) : (
                 <table>
                     <thead>
                         <tr>
-                            <th>ID</th>
                             <th>Usuario</th>
                             <th>Producto</th>
                             <th>Monto</th>
@@ -112,14 +126,17 @@ export default function Purchases() {
                     <tbody>
                         {purchases.map((p) => (
                             <tr key={p.id}>
-                                <td>{p.id}</td>
                                 <td>{p.user_name}</td>
                                 <td>{p.product_name}</td>
-                                <td>${Number(p.amount).toFixed(2)}</td>
-                                <td>{new Date(p.purchase_date).toLocaleString()}</td>
-                                <td>
-                                    <button className="danger" onClick={() => handleDelete(p.id)}>
-                                        Eliminar
+                                <td className="mono">${Number(p.amount).toFixed(2)}</td>
+                                <td className="mono">{new Date(p.purchase_date).toLocaleDateString()}</td>
+                                <td className="actions-cell">
+                                    <button
+                                        className="icon-btn danger"
+                                        title="Eliminar compra"
+                                        onClick={() => handleDelete(p.id, p.product_name)}
+                                    >
+                                        <Trash2 size={16} />
                                     </button>
                                 </td>
                             </tr>

@@ -1,5 +1,15 @@
 import React, { useEffect, useState } from "react";
+import { UserPlus, Trash2, Users as UsersIcon } from "lucide-react";
 import { useToast } from "./ToastContext.jsx";
+
+function initials(name) {
+    return name
+        .split(" ")
+        .filter(Boolean)
+        .slice(0, 2)
+        .map((w) => w[0]?.toUpperCase())
+        .join("");
+}
 
 export default function Users() {
     const [users, setUsers] = useState([]);
@@ -47,14 +57,14 @@ export default function Users() {
         }
     }
 
-    async function handleDelete(id) {
+    async function handleDelete(id, name) {
         try {
             const res = await fetch(`/api/users/${id}`, { method: "DELETE" });
             if (!res.ok) {
                 toast.error("No se pudo eliminar el usuario");
                 return;
             }
-            toast.success("Usuario eliminado");
+            toast.success(`Usuario "${name}" eliminado`);
             load();
         } catch (err) {
             toast.error("No se pudo conectar con el servidor");
@@ -63,7 +73,13 @@ export default function Users() {
 
     return (
         <div className="panel">
-            <h2>Usuarios</h2>
+            <div className="panel-title-row">
+                <h2>
+                    <UsersIcon size={20} strokeWidth={2.2} />
+                    Usuarios
+                </h2>
+                <span className="count-pill">{users.length}</span>
+            </div>
             {error && <div className="error">{error}</div>}
             <form className="inline" onSubmit={handleSubmit}>
                 <input
@@ -90,16 +106,21 @@ export default function Users() {
                     <option value="client">Cliente</option>
                     <option value="admin">Admin</option>
                 </select>
-                <button type="submit">Crear</button>
+                <button type="submit">
+                    <UserPlus size={16} />
+                    Crear
+                </button>
             </form>
             {users.length === 0 ? (
-                <p className="empty-state">Todavía no hay usuarios registrados.</p>
+                <div className="empty-state">
+                    <UsersIcon size={28} strokeWidth={1.6} />
+                    <p>Todavía no hay usuarios registrados. Crea el primero arriba.</p>
+                </div>
             ) : (
                 <table>
                     <thead>
                         <tr>
-                            <th>ID</th>
-                            <th>Nombre</th>
+                            <th>Usuario</th>
                             <th>Email</th>
                             <th>Rol</th>
                             <th>Creado</th>
@@ -109,14 +130,27 @@ export default function Users() {
                     <tbody>
                         {users.map((u) => (
                             <tr key={u.id}>
-                                <td>{u.id}</td>
-                                <td>{u.name}</td>
-                                <td>{u.email}</td>
-                                <td>{u.role}</td>
-                                <td>{new Date(u.created_at).toLocaleString()}</td>
                                 <td>
-                                    <button className="danger" onClick={() => handleDelete(u.id)}>
-                                        Eliminar
+                                    <div className="user-cell">
+                                        <span className="avatar">{initials(u.name) || "?"}</span>
+                                        <div>
+                                            <div className="user-name">{u.name}</div>
+                                            <div className="user-id">#{u.id}</div>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td>{u.email}</td>
+                                <td>
+                                    <span className={`badge badge-${u.role}`}>{u.role === "admin" ? "Admin" : "Cliente"}</span>
+                                </td>
+                                <td className="mono">{new Date(u.created_at).toLocaleDateString()}</td>
+                                <td className="actions-cell">
+                                    <button
+                                        className="icon-btn danger"
+                                        title="Eliminar usuario"
+                                        onClick={() => handleDelete(u.id, u.name)}
+                                    >
+                                        <Trash2 size={16} />
                                     </button>
                                 </td>
                             </tr>
@@ -127,8 +161,3 @@ export default function Users() {
         </div>
     );
 }
-
-
-
-
-///test

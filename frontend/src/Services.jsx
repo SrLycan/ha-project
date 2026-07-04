@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import { Package, PackagePlus, Trash2, Info } from "lucide-react";
 import { useToast } from "./ToastContext.jsx";
 
 export default function Services() {
@@ -46,14 +47,14 @@ export default function Services() {
         }
     }
 
-    async function handleDelete(id) {
+    async function handleDelete(id, name) {
         try {
             const res = await fetch(`/api/services/${id}`, { method: "DELETE" });
             if (!res.ok) {
                 toast.error("No se pudo eliminar el servicio");
                 return;
             }
-            toast.success("Servicio eliminado");
+            toast.success(`Servicio "${name}" eliminado`);
             load();
         } catch (err) {
             toast.error("No se pudo conectar con el servidor");
@@ -62,8 +63,15 @@ export default function Services() {
 
     return (
         <div className="panel">
-            <h2>Servicios</h2>
+            <div className="panel-title-row">
+                <h2>
+                    <Package size={20} strokeWidth={2.2} />
+                    Servicios
+                </h2>
+                <span className="count-pill">{services.length}</span>
+            </div>
             <p className="hint">
+                <Info size={13} />
                 Estos datos viven en memoria del backend y se reinician si el contenedor se reinicia.
             </p>
             {error && <div className="error">{error}</div>}
@@ -87,15 +95,20 @@ export default function Services() {
                     onChange={(e) => setForm({ ...form, price: e.target.value })}
                     required
                 />
-                <button type="submit">Crear</button>
+                <button type="submit">
+                    <PackagePlus size={16} />
+                    Crear
+                </button>
             </form>
             {services.length === 0 ? (
-                <p className="empty-state">Todavía no hay servicios registrados.</p>
+                <div className="empty-state">
+                    <Package size={28} strokeWidth={1.6} />
+                    <p>Todavía no hay servicios registrados.</p>
+                </div>
             ) : (
                 <table>
                     <thead>
                         <tr>
-                            <th>ID</th>
                             <th>Nombre</th>
                             <th>Descripcion</th>
                             <th>Precio</th>
@@ -105,13 +118,16 @@ export default function Services() {
                     <tbody>
                         {services.map((s) => (
                             <tr key={s.id}>
-                                <td>{s.id}</td>
                                 <td>{s.name}</td>
                                 <td>{s.description}</td>
-                                <td>${Number(s.price).toFixed(2)}</td>
-                                <td>
-                                    <button className="danger" onClick={() => handleDelete(s.id)}>
-                                        Eliminar
+                                <td className="mono">${Number(s.price).toFixed(2)}</td>
+                                <td className="actions-cell">
+                                    <button
+                                        className="icon-btn danger"
+                                        title="Eliminar servicio"
+                                        onClick={() => handleDelete(s.id, s.name)}
+                                    >
+                                        <Trash2 size={16} />
                                     </button>
                                 </td>
                             </tr>
