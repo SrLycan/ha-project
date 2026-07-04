@@ -2,13 +2,22 @@ import React, { useState } from "react";
 import Users from "./Users.jsx";
 import Purchases from "./Purchases.jsx";
 import Services from "./Services.jsx";
+import MonitorStatus from "./MonitorStatus.jsx";
+import { useTheme } from "./useTheme.js";
 
 export default function App() {
     const [tab, setTab] = useState("users");
+    const { theme, toggleTheme } = useTheme();
 
     return (
         <div className="app">
-            <h1>Panel Admin - Startup</h1>
+            <div className="app-header">
+                <h1>Panel Admin - Startup</h1>
+                <button className="theme-toggle" onClick={toggleTheme}>
+                    {theme === "dark" ? "☀️ Claro" : "🌙 Oscuro"}
+                </button>
+            </div>
+
             <div className="tabs">
                 <button className={tab === "users" ? "active" : ""} onClick={() => setTab("users")}>
                     Usuarios
@@ -31,14 +40,7 @@ export default function App() {
             {tab === "purchases" && <Purchases />}
             {tab === "services" && <Services />}
 
-            <a
-                className="link-external"
-                href={`http://${window.location.hostname}:8080`}
-                target="_blank"
-                rel="noreferrer"
-            >
-                Ver dashboard de monitoreo (SLI) →
-            </a>
+            <MonitorStatus />
         </div>
     );
 }
